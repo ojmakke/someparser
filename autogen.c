@@ -259,47 +259,32 @@ unsigned char* littleFronBigEndian(unsigned char* in, int bitStart, int bitLengt
   char rightBit = 7 - endBit%8; /* This is how many bits should be empty on the right */
   printf("Right Bit = %d\n", rightBit);
   int jj; /* Now we shift bytes to right. In fact, we shift shorts to shift across arrays */
-  typedef union UTrick_Def
-  {
-    unsigned short* temp;
-    unsigned char* data;
-  } UTrick;
-  
-  UTrick trick;
-  unsigned short tempValue;
-  if(sizeof(unsigned short) != 2)
+ 
+  for(jj = bufferSize-1; jj > 0; jj--)
     {
-      printf("ALERT: Compatibility issues.\n");
-      free(buffer);
-      return NULL;
+      printf("original buffer for  %d is  %d\n", jj, buffer[jj]);
+      buffer[jj] = buffer[jj]>>rightBit;
+      printf("After shifting by %d the number is %d\n", rightBit, buffer[jj]);
+      char rightMask = (1<<(rightBit))-1 ; /* How much from jj + 1 will be in jj */
+      printf("Mask is found to be %d\n", rightMask);
+      unsigned char carry = buffer[jj-1]&rightMask; /* This is the carry */
+      printf("Carry is %d\n", carry);
+      buffer[jj] = buffer[jj] | (carry<<(8-rightBit)); /* Insert in jj*/
+      printf("Final value is %d\n", buffer[jj]);
+      
     }
-  for(jj = bufferSize-2; jj >= 0; jj--)
+  /* Fix last ine, the 0 index. Just shift */
+  buffer[0] = buffer[0]>>rightBit;
+
+  for(jj = 0; jj < bufferSize; jj++)
     {
-      printf("original buffer is %d\n", buffer[jj]);
-      trick.temp = (unsigned short *) &buffer[jj];
-      tempValue = *trick.temp; /* now tempValue has 2 bytes */
-      /* Now temp points to a short in memory. LSB is at jj. MSB is at jj+1
-	 abuse that :) */
-      tempValue = (tempValue)>>rightBit; /* we shift to left because in little endian, MSB is on left */
-      trick.temp = &tempValue;
-      buffer[jj+1] = trick.data[1];
-      printf("Copied a byte \n");
-      printf("Data copied was %d\n", (unsigned char)trick.data[1]);
+      printf("After shifting, buffer at %d is %d\n", jj, buffer[jj]);
     }
 
-  /* Now take care of the last byte */
-  trick.temp = (unsigned short *) &buffer[0];
-  tempValue = *trick.temp;
-  tempValue = (tempValue)>>rightBit;
-  trick.temp = &tempValue;
-  buffer[0] = trick.data[0];
- 
-  
-  /* Now swap byte order to make it big endian */
-  for(jj = 0; jj < (bufferSize)/2; jj++)
+  /* Now make little endian */
+  for(jj = 0; jj < bufferSize/2; jj++)
     {
       unsigned char temp = buffer[jj];
-      printf("Temp is %d and buffer is%d and jj is%d\n", temp, buffer[jj], jj);
       buffer[jj] = buffer[bufferSize-1-jj];
       buffer[bufferSize-1-jj] = temp;
     }
@@ -339,8 +324,8 @@ void test()
   data = &val;
   data[0] = 170;
   data[1] = 192;
-  data[2] = 0;
-  data[3] = 0;
+  data[2] = 156;
+  data[3] = 64;
   // val = 43712;
   struct MessageStruct message;
   message.length = 4;
@@ -351,13 +336,14 @@ void test()
     {
       printf("Byte %d is %d\n", (unsigned int) ii, data[ii]);
     }
-    unsigned char* value = littleFronBigEndian(data, 0, 2);
+    unsigned char* value = littleFronBigEndian(data, 20, 3);
   
   for(ii = 0; ii < 1; ii++)
     {
       printf("Byte %d is %d\n", (unsigned int) ii, value[ii]);
     }
-  printf("Test data is %d\n", *((unsigned short*) value));
+  printf("Test data is %d\n", *((unsigned char*) value));
+
   
 }
 
