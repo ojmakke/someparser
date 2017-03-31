@@ -8,7 +8,10 @@ extern void init();
 extern void clean();
 extern void sortById();
 extern void test();
+
 extern struct MessageStruct *getMessage(unsigned int messageID);
+
+extern void printMessageDetails(struct MessageStruct *);
 extern void printSignalValues(struct MessageStruct* message);
 
 
@@ -48,6 +51,8 @@ struct MessageStruct
   char *messageName;
   char *sender;
   unsigned char* data;
+  double timeStamp;
+  double delta;
   unsigned int id;
 };
 

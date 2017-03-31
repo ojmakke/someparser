@@ -67,6 +67,7 @@
 #include "terminal.h"
 #include "lib.h"
 #include "autogen.h"
+#include "mydisplay.h"
 
 #define MAXSOCK 16    /* max. number of CAN interfaces given on the cmdline */
 #define MAXIFNAMES 30 /* size of receive name index to omit ioctls */
@@ -200,8 +201,7 @@ int idx2dindex(int ifidx, int socket) {
 
 int runCan(int argc, char **argv)
 {
-  printf("Entering main loop");
-  // return 0;
+
   fd_set rdfs;
   int s[MAXSOCK];
   int bridge = 0;
@@ -672,7 +672,7 @@ int runCan(int argc, char **argv)
 	    struct timeval recvTime;
 	    gettimeofday(&recvTime,NULL);
 	    double mTime  = recvTime.tv_sec*1000.0 + (recvTime.tv_usec)/1000.0;
-	    printf("The delta is %f\n", mTime - message->timeStamp);
+	    //   printf("The delta is %f\n", mTime - message->timeStamp);
 	   
 	    message->delta = mTime - message->timeStamp;
 	    message->timeStamp = mTime;

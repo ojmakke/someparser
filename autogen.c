@@ -226,7 +226,7 @@ BYTEX: Bitn Bitn-1, ... Bit0 (Inverted Bit Numbering)
 
 BitStart starts at 0. Bitlength > 0 always
 */
-unsigned char* littleFronBigEndian(unsigned char* in, int bitStart, int bitLength)
+unsigned char* littleFromBigEndian(unsigned char* in, int bitStart, int bitLength)
 {
   /* Using reverse bits is confusing here. bit 7 means leftmost bit */
   unsigned int startByte = bitStart/8;
@@ -262,24 +262,24 @@ unsigned char* littleFronBigEndian(unsigned char* in, int bitStart, int bitLengt
  
   for(jj = bufferSize-1; jj > 0; jj--)
     {
-      printf("original buffer for  %d is  %d\n", jj, buffer[jj]);
+      //printf("original buffer for  %d is  %d\n", jj, buffer[jj]);
       buffer[jj] = buffer[jj]>>rightBit;
-      printf("After shifting by %d the number is %d\n", rightBit, buffer[jj]);
+      //printf("After shifting by %d the number is %d\n", rightBit, buffer[jj]);
       char rightMask = (1<<(rightBit))-1 ; /* How much from jj + 1 will be in jj */
-      printf("Mask is found to be %d\n", rightMask);
+      //printf("Mask is found to be %d\n", rightMask);
       unsigned char carry = buffer[jj-1]&rightMask; /* This is the carry */
-      printf("Carry is %d\n", carry);
+      //printf("Carry is %d\n", carry);
       buffer[jj] = buffer[jj] | (carry<<(8-rightBit)); /* Insert in jj*/
-      printf("Final value is %d\n", buffer[jj]);
+      //   printf("Final value is %d\n", buffer[jj]);
       
     }
   /* Fix last ine, the 0 index. Just shift */
   buffer[0] = buffer[0]>>rightBit;
 
-  for(jj = 0; jj < bufferSize; jj++)
-    {
-      printf("After shifting, buffer at %d is %d\n", jj, buffer[jj]);
-    }
+  //for(jj = 0; jj < bufferSize; jj++)
+  //  {
+  //    printf("After shifting, buffer at %d is %d\n", jj, buffer[jj]);
+  //  }
 
   /* Now make little endian */
   for(jj = 0; jj < bufferSize/2; jj++)
@@ -336,14 +336,38 @@ void test()
     {
       printf("Byte %d is %d\n", (unsigned int) ii, data[ii]);
     }
-    unsigned char* value = littleFronBigEndian(data, 20, 3);
+    unsigned char* value = littleFromBigEndian(data, 20, 3);
   
   for(ii = 0; ii < 1; ii++)
     {
       printf("Byte %d is %d\n", (unsigned int) ii, value[ii]);
     }
   printf("Test data is %d\n", *((unsigned char*) value));
+  
+}
 
+void printMessageDetails(struct MessageStruct *message)
+{
+  if(message == NULL) return;
+  if(message->signals == NULL) return;
+
+  int ii;
+  printf("%4.1f %s %d\t", message->delta, message->messageName, message->length);
+
+  for(ii = 0; ii < message->length; ii++)
+    {
+      printf("%d ", message->data[ii]);
+    }
+  printf("\n");
+
+  
+  for(ii = 0; ii < message->signalNumber; ii++)
+    {
+      unsigned char* signalVal = littleFromBigEndian(message->data , message->signals[ii]->bitStart, message->signals[ii]->length);
+      
+      printf("\t%s\t\t\t%d\n", message->signals[ii]->signalName, *(unsigned short *) signalVal);
+      free(signalVal);
+    }
   
 }
 

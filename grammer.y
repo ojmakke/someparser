@@ -106,14 +106,15 @@ main(int argc, char *argv[])
   init();
   yyparse();
   sortById();
-  printAllInfo();
+  // printAllInfo();
 
-  printf("Testing _________");
-  printMessageInfo(getMessage(1970));
-  printMessageInfo(getMessage(2008));
-  printMessageInfo(getMessage(2015));
+// printf("Testing _________");
+  //printMessageInfo(getMessage(1970));
+  //printMessageInfo(getMessage(2008));
+  //  printMessageInfo(getMessage(2015));
 
-  test();
+  //  test();
+  runCan(argc, argv);
   
   clean();
 }
