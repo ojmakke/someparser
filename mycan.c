@@ -61,6 +61,9 @@
 #include <sys/uio.h>
 #include <net/if.h>
 
+#include <pthread.h>
+#include <ncurses.h>
+
 #include <linux/can.h>
 #include <linux/can/raw.h>
 
@@ -68,6 +71,7 @@
 #include "lib.h"
 #include "autogen.h"
 #include "mydisplay.h"
+#include "lib/ojlib/timer/ojtimer.h"
 
 #define MAXSOCK 16    /* max. number of CAN interfaces given on the cmdline */
 #define MAXIFNAMES 30 /* size of receive name index to omit ioctls */
@@ -201,7 +205,6 @@ int idx2dindex(int ifidx, int socket) {
 
 int runCan(int argc, char **argv)
 {
-
   fd_set rdfs;
   int s[MAXSOCK];
   int bridge = 0;
@@ -676,17 +679,43 @@ int runCan(int argc, char **argv)
 	   
 	    message->delta = mTime - message->timeStamp;
 	    message->timeStamp = mTime;
-
-	    message->data = frame.data;
+	    //message->data = frame.data;
 	    message->length = frame.can_dlc;
+	    {
+	      int ii;
+	      for(ii = 0; ii < message->length; ii++)
+		{
+		  message->data[ii] = frame.data[ii];
+		}
+	    }
 	    //    message->recvTime = recvTime;
+	    static int timerStarted = 0;
+	    static timer_t dispTimerId;
+	    if(timerStarted == 0)
+	      {
+		
+		//		makeCANWin();
+		timerStarted = 1;
+		pthread_attr_t attr;
+		int s;
+		s = pthread_attr_init(&attr);
+		static pthread_t tid;
+		static int arg;
+		pthread_create(&tid, NULL, start_display, NULL);
+		// Start the threaded application. Need to implement deadlocks
+		//register_timer(&dispTimerId, updateVisibleMessages , 2000);
+		//	register_threadedTimer(&dispTimerId, updateVisibleMessages, 10000);
+	      }
+	    //updateFromAllMessages(message);
 	   
+	    //union sigval l;
+	    //updateVisibleMessages(l);
 	    //	    printMessageInfo(message);
-	    printMessageDetails(message);
+	    //	    printMessageDetails(message);
 	  }
 	else
 	  {
-	    printf("Message %d is NULL\n", frame.can_id);
+	    //	    printf("Message %d is NULL\n", frame.can_id);
 	  }
 	
 	/*s

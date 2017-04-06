@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "grammer.tab.h"
 #include "autogen.h"
+#include <ncurses.h>
 
 
   // declare variables for signals, because they are broken into two tokens
@@ -100,11 +101,16 @@ somethingelse: NOTHING {printf("Found something else\n");}
 %%
 extern int yylineno;
 extern char* yytext;
+extern FILE* yyin;
 
 main(int argc, char *argv[])
 {
   init();
+  
+  yyin = fopen(argv[1], "r");
+  printf("yyin is %d and argv1 is %s\n", yyin, argv[1]);
   yyparse();
+  fclose(yyin); 
   sortById();
   // printAllInfo();
 
@@ -114,6 +120,9 @@ main(int argc, char *argv[])
   //  printMessageInfo(getMessage(2015));
 
   //  test();
+
+  argc--;
+  argv = &argv[1];
   runCan(argc, argv);
   
   clean();

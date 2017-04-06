@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "grammer.tab.h"
+#include "mydisplay.h"
+
 
 void printAllInfo();
 
@@ -42,7 +44,8 @@ void addMessage(char* name,
   newMessage->messageName = name;
   newMessage->sender = source;
   activeMessage = newMessage;
-  newMessage->data = NULL;
+  newMessage->data = (unsigned char *)malloc(length);
+  memset(newMessage->data, 0, length);
   printf("Active message set to %s\n", newMessage->messageName);
   newMessage->signals = NULL;
   newMessage->signalNumber = 0;
@@ -252,12 +255,12 @@ unsigned char* littleFromBigEndian(unsigned char* in, int bitStart, int bitLengt
 	}
     
       buffer[ii] = in[startByte + ii]&mask;
-      printf("Mask is %d and byte is %d\n", mask, buffer[ii]);
-      printf("Looping ... \n");
+      //  printf("Mask is %d and byte is %d\n", mask, buffer[ii]);
+      //      printf("Looping ... \n");
     }
 
   char rightBit = 7 - endBit%8; /* This is how many bits should be empty on the right */
-  printf("Right Bit = %d\n", rightBit);
+  //  printf("Right Bit = %d\n", rightBit);
   int jj; /* Now we shift bytes to right. In fact, we shift shorts to shift across arrays */
  
   for(jj = bufferSize-1; jj > 0; jj--)
@@ -320,7 +323,8 @@ void test()
 {
   printf("testing\n");
   unsigned char* data;
-  unsigned int val;
+  unsigned char val[8];
+
   data = &val;
   data[0] = 170;
   data[1] = 192;
@@ -330,7 +334,13 @@ void test()
   struct MessageStruct message;
   message.length = 4;
   message.id = 13;
-  message.data = data;
+  {
+    int ii;
+    for(ii = 0; ii < 8; ii++)
+      {
+	message.data[ii] = data[ii];
+      }
+  }
   int ii;
     for(ii = 0; ii < message.length; ii++)
     {
@@ -351,6 +361,15 @@ void printMessageDetails(struct MessageStruct *message)
   if(message == NULL) return;
   if(message->signals == NULL) return;
 
+  static int isInitialized = 0;
+  if(isInitialized == 0)
+    {
+      makeCANWin();
+      isInitialized = 1;
+    }
+  updateFromAllMessages(message);
+  return;
+  
   int ii;
   printf("%4.1f %s %d\t", message->delta, message->messageName, message->length);
 
