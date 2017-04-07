@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-c -Wall
-LFLAGS=-lcurses -lrt -lpthread
+LFLAGS=-lcurses -lrt -lpthread -lpanel
 
 all: actual
 

@@ -7,7 +7,6 @@
 #include <signal.h>
 
 extern void makeCANWin();
-extern void updateFromAllMessages(struct MessageStruct *message);
 extern int updateVisibleMessages();
 
 

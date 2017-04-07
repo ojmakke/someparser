@@ -236,10 +236,10 @@ unsigned char* littleFromBigEndian(unsigned char* in, int bitStart, int bitLengt
   unsigned int lrBitStart = (startByte)*8 + 7-bitStart%8; /* Starting from left to right*/
   unsigned int endBit = lrBitStart + bitLength -1; /* Last bit, inclusive */
   unsigned int endByte = endBit/8;
-  printf("startByte:\t%d\n lrBitStart\t%d\n endBit:\t%d\n endByte\t%d\n",
-	 startByte, lrBitStart, endBit, endByte);
+  //printf("startByte:\t%d\n lrBitStart\t%d\n endBit:\t%d\n endByte\t%d\n",
+  //	 startByte, lrBitStart, endBit, endByte);
   size_t bufferSize = (endByte - startByte) + 1; /* 0-7, 1. 8-15, 2 */
-  printf("Bufer size: %lu\n", bufferSize);
+  // printf("Bufer size: %lu\n", bufferSize);
   unsigned char* buffer = (unsigned char *) malloc(bufferSize);
   memset(buffer, 0, bufferSize);
   
@@ -367,7 +367,7 @@ void printMessageDetails(struct MessageStruct *message)
       makeCANWin();
       isInitialized = 1;
     }
-  updateFromAllMessages(message);
+  //  updateFromAllMessages(message);
   return;
   
   int ii;
