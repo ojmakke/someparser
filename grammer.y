@@ -3,7 +3,7 @@
 #include "grammer.tab.h"
 #include "autogen.h"
 #include <ncurses.h>
-
+#include "sender.h"
 
   // declare variables for signals, because they are broken into two tokens
   unsigned int bitStart;
@@ -120,7 +120,8 @@ main(int argc, char *argv[])
   //  printMessageInfo(getMessage(2015));
 
   //  test();
-
+//  testSend();
+  
   argc--;
   argv = &argv[1];
   runCan(argc, argv);

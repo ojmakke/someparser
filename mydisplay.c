@@ -1,6 +1,7 @@
 #include "mydisplay.h"
+#include "sender.h" 
 #include "autogen.h"
-
+    
 #include <ncurses.h>
 #include <string.h>
 #include <stdlib.h>
@@ -183,7 +184,10 @@ int updateVisibleMessages()
 	{
 	  cursorIndex++;
 	}
-      if(displayedCount + 1 < LINES) wclear(winMain);
+      if(displayedCount + 1 < LINES)
+	{
+	   wclear(winMain);
+	}
     }
   if(ch == KEY_UP && cursorIndex > 1)
     {
@@ -204,6 +208,17 @@ int updateVisibleMessages()
   if(ch == 'c')
     {
       wclear(winMain);
+    }
+  if(ch == 'u')
+    {
+      // u is for up
+      struct MessageStruct up;
+      memset(&up, 0, sizeof(up));
+      up.data = (unsigned char*)malloc(8);
+      up.id = 866;
+      up.length = 8;
+      up.data[1] = 20;
+      sendCan(&up);
     }
   if(ch == 's' && mwVisible == 1)
     {

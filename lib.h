@@ -45,6 +45,9 @@
  *
  */
 
+#include <stddef.h>
+#include <stdio.h>
+
 unsigned char asc2nibble(char c);
 /*
  * Returns the decimal value of a given ASCII hex character.
