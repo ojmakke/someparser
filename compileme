@@ -1,0 +1,3 @@
+bison -d grammer.y
+flex scanner.l
+gcc lex.yy.c autogen.c grammer.tab.c -o can
